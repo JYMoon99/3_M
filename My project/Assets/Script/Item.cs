@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Item : MonoBehaviour
@@ -7,20 +8,38 @@ public class Item : MonoBehaviour
     public enum Type{ Ammo, Coin, Grenade, Heart, Weapon }
     public Type type;
     public int value;
+    float moveSpeed = 2f;
+    float delta = 0.2f;
 
-    GameObject gameobject;
-
-    float itemRotate = 0.1f;
-
+    Vector3 currentY;
 
     private void Awake()
     {
     }
 
+    private void Start()
+    {
+        currentY = transform.position;
+    }
+
     private void Update()
     {
-        transform.Rotate(0, itemRotate, 0);
+        ItemMoving();
     }
 
 
+
+
+
+    #region ¾ÆÀÌÅÛ ¹«ºù
+    void ItemMoving()
+    {
+        Vector3 itemVec = currentY;
+        itemVec.y += delta * Mathf.Sin(Time.time * moveSpeed);
+        transform.position = itemVec;
+
+      
+    }
+
+    #endregion
 }
