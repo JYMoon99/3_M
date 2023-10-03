@@ -8,10 +8,10 @@ public class Item : MonoBehaviour
     public enum Type{ Ammo, Coin, Grenade, Heart, Weapon }
     public Type type;
     public int value;
-    float moveSpeed = 2f;
-    float delta = 0.2f;
+    protected float moveSpeed = 2f;
+    protected float delta = 0.2f;
 
-    Vector3 currentY;
+    protected Vector3 currentY;
 
     private void Awake()
     {

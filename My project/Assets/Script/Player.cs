@@ -9,6 +9,20 @@ public class Player : MonoBehaviour
     [SerializeField] float speed;
     public GameObject[] weapons;
     public bool[] hasWeapons;
+    public GameObject[] grenades;
+    public int hasgrenades;
+
+    public int ammo;
+    public int coin;
+    public int health;
+    public int hasGrenades;
+
+    public int MaxAmmo;
+    public int MaxCoin;
+    public int MaxHealth;
+    public int MaxHasGrenades;
+
+
     float hAxis;
     float vAxis;
 
@@ -78,6 +92,8 @@ public class Player : MonoBehaviour
             moveVec = dodgeVec;
         }
 
+        if(isSwap) { moveVec = Vector3.zero; }
+
         transform.position += moveVec * speed * (wDown ? 0.3f : 1f) * Time.deltaTime;
 
         anim.SetBool("isRun", moveVec != Vector3.zero);
@@ -146,7 +162,6 @@ public class Player : MonoBehaviour
 
         if (sDown1 || sDown2 || sDown3)
         {
-            moveVec = Vector3.zero;
 
             if (equipWeapon != null)
             {
@@ -162,6 +177,8 @@ public class Player : MonoBehaviour
             isSwap = true;
 
             Invoke("SwapOut", 0.4f);
+
+            moveVec = Vector3.zero;
         }
     }
 
@@ -184,6 +201,42 @@ public class Player : MonoBehaviour
             }
         }
     }
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.tag == "Item")
+        {
+            Item item = other.GetComponent<Item>();
+            switch (item.type)
+            {
+                case Item.Type.Ammo:
+                    ammo += item.value;
+                    if (ammo >= MaxAmmo)
+                        ammo = MaxAmmo;
+                    break;
+                case Item.Type.Coin:
+                    coin += item.value;
+                    if (coin >= MaxCoin)
+                        coin = MaxCoin;
+                    break;
+                case Item.Type.Heart:
+                    health += item.value;
+                    if (health >= MaxHealth) 
+                        health = MaxHealth;
+                    break;
+                case Item.Type.Grenade:
+                    grenades[hasGrenades].SetActive(true);
+                    hasGrenades += item.value;
+                    if (hasGrenades >= MaxHasGrenades)
+                        hasGrenades = MaxHasGrenades;
+                    break;
+            }
+            Destroy(other.gameObject);
+
+        }
+    }
+
     private void OnTriggerStay(Collider other)
     {
         if(other.tag == "Weapon")
