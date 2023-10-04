@@ -7,11 +7,12 @@ public class Orbit : MonoBehaviour
     public Transform target;
     public float orbitSpeed;
 
-     Vector3 offset;
+    Vector3 offset;
 
     void Start()
     {
-        offset = transform.position - target.position;
+       offset = transform.position - target.position;
+
     }
 
     private void Update()

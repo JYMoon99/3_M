@@ -34,11 +34,10 @@ public class Item : MonoBehaviour
     #region 아이템 무빙
     void ItemMoving()
     {
+        // Item 반복 운동
         Vector3 itemVec = currentY;
         itemVec.y += delta * Mathf.Sin(Time.time * moveSpeed);
         transform.position = itemVec;
-
-      
     }
 
     #endregion

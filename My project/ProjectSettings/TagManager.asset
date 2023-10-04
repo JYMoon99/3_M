@@ -13,14 +13,14 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
+  - Floor
+  - BulletCase
+  - Wall
   - 
-  - 
-  - 
-  - 
-  - 
+  - PlayerBullet
   - 
   - 
   - 

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEditor;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ public class Player : MonoBehaviour
     public GameObject[] grenades;
     public int hasgrenades;
     public Camera followCamera;
-
+    
     public int ammo;
     public int coin;
     public int health;
@@ -42,6 +43,7 @@ public class Player : MonoBehaviour
     bool isSwap;
     bool isReload;
     bool isFireReady = true;
+    bool isBorder;
 
     Vector3 moveVec;
     Vector3 dodgeVec;
@@ -96,17 +98,23 @@ public class Player : MonoBehaviour
 
     void Move()
     {
+        // 움직임 구현
         moveVec = new Vector3(hAxis, 0, vAxis).normalized;
 
-        if(isDodge) // 회피중에는 움직임 벡터 -> 회피방향 벡터로 바꿈
+        if(isDodge) 
         {
+            // 회피중에는 움직임 벡터 -> 회피방향 벡터로 바꿈
             moveVec = dodgeVec;
         }
 
-        if(isSwap || !isFireReady) { moveVec = Vector3.zero; }
+        // 무기 스왑중일때는 움직이지 않게 구현
+        if(isSwap) { moveVec = Vector3.zero; }
 
+        // 걷기 속도는 0.3f / 평상시 속도 1f
+        if(!isBorder)
         transform.position += moveVec * speed * (wDown ? 0.3f : 1f) * Time.deltaTime;
 
+        // 벡터가 0이 아니면 애니메이션 "isRun" 동작
         anim.SetBool("isRun", moveVec != Vector3.zero);
         anim.SetBool("isWalk", wDown);
     }
@@ -122,10 +130,14 @@ public class Player : MonoBehaviour
 
         if (fDown)
         {
+            // Physics.Raycast는 직선을 씬에 투영하여 대상에 적중되면 true를 리턴하는 물리 함수다.
             if (Physics.Raycast(ray, out rayHit, 100)) // out : return처럼 반환값을 주어진 변수에 저장하는 키워드
             {
+                // 충돌하는 지점 거리 계산
                 Vector3 nextVec = rayHit.point - transform.position;
+                // 캐릭터가 위를 쳐다보지 않게 하기
                 nextVec.y = 0;
+                // 캐릭터가 마우스 포인트를 쳐다보게 구현
                 transform.LookAt(transform.position + nextVec);
             }
         }
@@ -134,11 +146,13 @@ public class Player : MonoBehaviour
 
     void Jump()
     {
+        // 플레이어가 움직이지 않을때 점프 가능
         if(jDown && moveVec == Vector3.zero && !isJump && !isDodge) 
         {
             rigid.AddForce(Vector3.up * 15, ForceMode.Impulse); // ForceMode.Impulse : 즉발적으로 힘을 가함
             anim.SetBool("isJump", true);
             anim.SetTrigger("doJump");
+            // isJump = true를 함으로써 더블점프 막기
             isJump = true;
         }
     }
@@ -148,14 +162,16 @@ public class Player : MonoBehaviour
    
 
     void Dodge()
-    {
+    {   // 점프와 똑같은 jDown(space)사용 조건은 플레이어가 움직이고 있을 때 true
         if (jDown && moveVec != Vector3.zero && !isJump && !isDodge)
         {
+            // 닷지 할때의 벡터값을 닷지벡터에 저장
             dodgeVec = moveVec;
             speed *= 2;
             anim.SetTrigger("doDodge");
             isDodge = true;
 
+            // 닷지 0.4f초 후 스피드값 정상화
             Invoke("DodgeOut", 0.4f); // 시간차 함수 호출
         }
     }
@@ -168,16 +184,21 @@ public class Player : MonoBehaviour
 
     void Attack()
     {
+        // 장착된 무기가 없을때 공격 방지
         if (equipWeapon == null)
             return;
 
+        // 대기 시간 저장
         fireDelay += Time.deltaTime; // Time.deltaTime : 1프레임 당 걸리는 시간
+        // 대기 시간보다 장착 무기의 공격속도가 낮으면 공격준비 true
         isFireReady = equipWeapon.rate < fireDelay;
 
         if (fDown && isFireReady && !isDodge && !isSwap)
         {
             equipWeapon.Use();
+            // 근접 무기일때는 스윙 : 나머지는 샷
             anim.SetTrigger(equipWeapon.type == Weapon.Type.Melee ? "doSwing" : "doShot");
+            // 대기 시간 초기화
             fireDelay = 0;
 
         }
@@ -185,13 +206,14 @@ public class Player : MonoBehaviour
 
     void Reload()
     {
+        // 오류 미리 방지
         if (equipWeapon == null) return;
 
         if (equipWeapon.type == Weapon.Type.Melee) return;
 
         if (ammo == 0) return;
 
-        if (rDown && !isJump && !isDodge && !isSwap && !isReload)
+        if (rDown && !isJump && !isDodge && !isSwap && !isReload && isFireReady) 
         {
             anim.SetTrigger("doReload");
             isReload = true;
@@ -202,6 +224,7 @@ public class Player : MonoBehaviour
 
     void ReloadOut()
     {
+        // 고쳐야 할 점 : 총알이 curAmmo와 관계없이 Ammo에서 equipWeapon.maxAmmo의 총알을 가져온다.
         int reAmmo = ammo < equipWeapon.maxAmmo ? ammo : equipWeapon.maxAmmo;
         equipWeapon.curAmmo = reAmmo;
         ammo -= reAmmo;
@@ -219,7 +242,7 @@ public class Player : MonoBehaviour
 
     void Swap()
     {
-
+        // 무기를 장착중일때 같은 무기를 다시 장착 방지 && 해당 무기를 소유하고 있지 않을 때 장착 방지
         if (sDown1 && (!hasWeapons[0] || equipWeaponIndex == 0))
             return;
         if (sDown2 && (!hasWeapons[1] || equipWeaponIndex == 1))
@@ -234,7 +257,7 @@ public class Player : MonoBehaviour
 
         if (sDown1 || sDown2 || sDown3)
         {
-
+            // 장착중인 무기가 있을때만 해당 무기를 비활성화
             if (equipWeapon != null)
             {
                 equipWeapon.gameObject.SetActive(false);
@@ -250,6 +273,7 @@ public class Player : MonoBehaviour
 
             Invoke("SwapOut", 0.4f);
 
+            // 스왑도중에는 이동불가
             moveVec = Vector3.zero;
         }
     }
@@ -267,16 +291,35 @@ public class Player : MonoBehaviour
             {
                 Item item = nearObject.GetComponent<Item>();
                 int weaponIndex = item.value;
+                // 해당 무기 인덱스값 저장
                 hasWeapons[weaponIndex] = true;
-
+                // 드롭한 무기 제거
                 Destroy(nearObject);
             }
         }
     }
 
+    void FreezeRotation()
+    {
+        rigid.angularVelocity = Vector3.zero; // angularVelocity : 물리 회전 속도
+    }
+
+    void StopToWall()
+    {
+        Debug.DrawRay(transform.position, transform.forward * 5f, Color.green); // DrawRay() : Scene내에서 Ray를 보여주는 함수
+        isBorder = Physics.Raycast(transform.position, transform.forward, 5, LayerMask.GetMask("Wall"));
+    }
+   
+    void FixedUpdate()
+    {
+        FreezeRotation();
+        StopToWall();
+    }
+
 
     private void OnTriggerEnter(Collider other)
     {
+        // 아이템 획득 및 Max설정
         if(other.tag == "Item")
         {
             Item item = other.GetComponent<Item>();

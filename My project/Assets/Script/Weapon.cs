@@ -49,14 +49,18 @@ public class Weapon : MonoBehaviour
 
     IEnumerator Shot()
     {
-        GameObject instantBullet = Instantiate(bullet, bulletPos.position, bulletPos.rotation); // Instantiate() : ÇÁ¸®Æé »ý¼º
+        // ÃÑ¾Ë »ý¼º
+        GameObject instantBullet = Instantiate(bullet, bulletPos.position, bulletPos.rotation); // Instantiate() : ¿ÀºêÁ§Æ® »ý¼º
         Rigidbody bulletRigid = instantBullet.GetComponent<Rigidbody>();
         bulletRigid.velocity = bulletPos.forward * 50;
         yield return null;
+        // ÅºÇÇ »ý¼º
         GameObject instantBulletCase = Instantiate(bulletCase, bulletCasePos.position, bulletCasePos.rotation);
         Rigidbody bulletCaseRigid = instantBulletCase.GetComponent<Rigidbody>();
         Vector3 caseVec = bulletCasePos.forward * Random.Range(-1, -3) + Vector3.up * Random.Range(1, 3);
+        // ÅºÇÇ Æ¨°Ü³ª°¨
         bulletCaseRigid.AddForce(caseVec, ForceMode.Impulse);
+        // ÅºÇÇ È¸Àü ±¸Çö
         bulletCaseRigid.AddTorque(Vector3.up * 10, ForceMode.Impulse);
     }
 

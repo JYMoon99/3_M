@@ -7,14 +7,12 @@ public class Light : MonoBehaviour
 
     private void Update()
     {
-        // Vector3 itemVec = currentY;
-        // itemVec.y += delta * Mathf.Sin(Time.time * moveSpeed);
+        // 라이트 위치 고정
+        Vector3 rightVec = transform.position;
 
-        Vector3 itemVec = transform.position;
+        rightVec.y = 0.55f;
 
-        itemVec.y = 0.55f;
-
-        transform.position = itemVec;  
+        transform.position = rightVec;  
 
         
     }
