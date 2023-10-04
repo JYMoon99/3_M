@@ -57,6 +57,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Script\Light.cs" />
+    <Compile Include="Assets\Script\Weapon.cs" />
+    <Compile Include="Assets\Script\Bullet.cs" />
     <Compile Include="Assets\Script\Item.cs" />
     <Compile Include="Assets\Script\Player.cs" />
     <Compile Include="Assets\QuarterView 3D Action BE5\ReadMe\Scripts\ReadmeBE5.cs" />
