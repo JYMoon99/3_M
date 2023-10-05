@@ -11,7 +11,7 @@ public class Player : MonoBehaviour
     public GameObject[] weapons;
     public bool[] hasWeapons;
     public GameObject[] grenades;
-    public int hasgrenades;
+    public GameObject grenadeObject;
     public Camera followCamera;
     
     public int ammo;
@@ -32,6 +32,7 @@ public class Player : MonoBehaviour
     bool jDown;
     bool iDown;
     bool fDown;
+    bool gDown;
     bool rDown;
 
     bool sDown1;
@@ -74,6 +75,7 @@ public class Player : MonoBehaviour
         Move();
         Turn();
         Jump();
+        Grenade();
         Dodge();
         Attack();
         Reload();
@@ -88,6 +90,7 @@ public class Player : MonoBehaviour
         wDown = Input.GetButton("Walk");
         jDown = Input.GetButtonDown("Jump");
         fDown = Input.GetButton("Fire1");
+        gDown = Input.GetButtonDown("Fire2");
         rDown = Input.GetButtonDown("Reload");
         iDown = Input.GetButtonDown("Interation");
         sDown1 = Input.GetButtonDown("Swap1");
@@ -158,8 +161,36 @@ public class Player : MonoBehaviour
     }
 
 
+    void Grenade()
+    {
+        if (hasGrenades == 0)
+            return;
 
-   
+        if(gDown) 
+        {
+            Ray ray = followCamera.ScreenPointToRay(Input.mousePosition); // ScreenPointToRay() : 스크린에서 월드로 Ray를 쏘는 함수
+            RaycastHit rayHit;
+            if (Physics.Raycast(ray, out rayHit, 100)) // out : return처럼 반환값을 주어진 변수에 저장하는 키워드
+            {
+                // 충돌하는 지점 거리 계산
+                Vector3 nextVec = rayHit.point - transform.position;
+                // 수류탄 높이 던지기
+                nextVec.y = 10;
+
+                GameObject instantGrenade = Instantiate(grenadeObject, transform.position, transform.rotation);
+                Rigidbody rigidGrenade = instantGrenade.GetComponent<Rigidbody>();
+                rigidGrenade.AddForce(nextVec, ForceMode.Impulse);
+                rigidGrenade.AddTorque(Vector3.back * 10, ForceMode.Impulse);
+
+                hasGrenades--;
+                grenades[hasGrenades].SetActive(false);
+        
+            }
+        }
+
+        
+    }
+
 
     void Dodge()
     {   // 점프와 똑같은 jDown(space)사용 조건은 플레이어가 움직이고 있을 때 true
@@ -306,8 +337,10 @@ public class Player : MonoBehaviour
 
     void StopToWall()
     {
-        Debug.DrawRay(transform.position, transform.forward * 5f, Color.green); // DrawRay() : Scene내에서 Ray를 보여주는 함수
-        isBorder = Physics.Raycast(transform.position, transform.forward, 5, LayerMask.GetMask("Wall"));
+        // 캐릭터가 움직이는 방향대로 Scene에 보이는 Ray를 그림 
+        Debug.DrawRay(transform.position, moveVec * 5, Color.green); // DrawRay() : Scene내에서 Ray를 보여주는 함수
+        // 캐릭터가 움직이는 방향으로 Ray를 쏴서 벽을 인식
+        isBorder = Physics.Raycast(transform.position, moveVec, 5, LayerMask.GetMask("Wall"));
     }
    
     void FixedUpdate()
@@ -319,7 +352,7 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // 아이템 획득 및 Max설정
+        // 아이템 획득 및 Max 값 설정
         if(other.tag == "Item")
         {
             Item item = other.GetComponent<Item>();

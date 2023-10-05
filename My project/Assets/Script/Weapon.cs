@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class Weapon : MonoBehaviour
@@ -40,7 +41,7 @@ public class Weapon : MonoBehaviour
         meleeArea.enabled = true;
         traileffect.enabled = true;
 
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.2f);
         meleeArea.enabled = false;
 
         yield return new WaitForSeconds(0.3f);

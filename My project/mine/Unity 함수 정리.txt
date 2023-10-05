@@ -1,0 +1,98 @@
+LookAt() : 지정된 벡터를 향해서 회전시켜주는 함수
+Invoke() : 시간차 함수
+SetTrigger(파라미터 이름) : 트리거 작동
+SetBool(파라미터 이름, value) : 
+
+
+out : return처럼 반환값을 주어진 변수에 저장하는 키워드
+
+------------------[주요 오버로딩 함수]-----------------------
+
+Awake() : 스크립트가 실행될 때 한 번만 호출되는 함수, 주로 게임의 상태 값 또는 변수의 초기화에 사용
+Start() : Update()함수가 호출되기전에 한번만 호출, 코루틴으로 실행 가능
+Update() : 프레임마다 호출되는 함수로 게임의 핵심 로직을 작성, 스크립트가 활성화 돼 있어야 실행
+LateUpdate() : 모든 Update()함수가 호출되고 마지막에 한번씩 호출, 카메라 이동로직에 주로 사용한다.
+OnEnable() : 게임오브젝트 또는 스크립트가 활성화 될 때 호출, 이벤트 연결시 사용
+OnDisable() : 게임오브젝트 또는 스키립트가 비활성화 될 때 호출, 이벤트 종료시 사용
+
+--------------------[Input(입력)]-------------------------
+
+Input.GetKey() : 해당되는 키를 누르고 있을 경우 True를 반환한다.
+Input.GetKeyDown() : 해당되는 키를 눌렀을때 True를 반환한다.
+Input.GetKeyUp() : 해당되는 키를 눌렀다 땠을때 True를 반환한다.
+
+Button
+버튼은 프로젝트 세팅에서 설정해야 한다.
+
+GetButton() : 버튼을 누르고 있을 경우 True가 발생합니다.
+GetButtonDown() : 버튼을 누를때 한번 True가 발생합니다.
+GetButtonUp() : 버튼을 눌렀다가 땠을 경우 True가 발생합니다.
+
+Axis
+Input.GetAxis() : 1.0f 부터 1.0f 까지의 범위의 값을 반환한다. 즉, 부드러운 이동이 필요한 경우에 사용된다.
+Input.GetAxisRaw() : 1, 0, 1 세 가지 값 중 하나가 반환된다. 키보드 값을 눌렀을 때 즉시 반응해야한다면 GetAxisRaw를 사용하면 된다.
+
+마우스
+GetMouseButtonDown() : 마우스 버튼을 눌렀을때
+GetMouseButton() : 마우스 버튼을 누르고 있는 도중
+GetMouseButtonUp() : 마우스 버튼을 뗄떼
+0 : 마우스 왼쪽 버튼
+1 : 마우스 오른쪽 버튼
+2 : 마우스 휠 버튼
+3~6 : 마우스에 달린 추가 버튼
+
+-------------------------[ Ray ]------------------------------
+
+RayCastHit - Raycast 메서드 사용시에 반환받는 총돌 정보를 담고 있음
+{
+       collider : ray가 충돌한 충돌체
+       point : 충돌체와 충돌한 지점
+       normal : 충동한 지점에서 면에 수직인 법선벡터 (법선벡터의 길이는 1)
+       distance : ray의 origin으로부터 충돌한 지점까지의 거리
+       transform : 충돌체의 transform 컴포넌트
+       rigidbody : 충돌체의 RigidBody 컴포넌트
+}
+
+DrawRay() : Scene내에서 Ray를 보여주는 함수
+
+
+Physics.Raycast : 직선을 씬에 투영하여 대상에 적중되면 true를 리턴하는 물리 함수다.
+ScreenPointToRay(Ray를 쏠 포지션) : 스크린에서 월드로 Ray를 쏘는 함수
+
+----------------------------[ Mathf ]------------------------------
+
+Mathf.Clamp() : 주어진 값에 대해서 최소값(min)과 최대값(max) 사이의 범위로 제한한 값을 반환합니다. 
+값이 최소값보다 작으면 최소값을 반환하고 값이 최대값보다 크면 최대값을 반환합니다.
+
+Mathf.Abs() : 주어진 값의 절대값을 반환합니다.
+Mathf.Min(), Mathf.Max() : 주어진 두개의 값에 대해서 각각 최소값과 최대값을 반환합니다.
+
+Mathf.Round() : 주어진 값(실수)에 대해서 반올림한 값을 반환합니다. 
+Mathf.Round 함수의 리턴 타입은 실수이고(float) 
+Mathf.RoundToInt 함수의 리턴타입은 정수이다(int)입니다.
+값이 .5인 경우 가까운 짝수를 반환합니다(4.5의 경우 4를 반환, 5.5의 경우 6을 반환)
+
+Mathf.Cell() : 주어진 값(실수)에 대해서 올림한 값을 반환합니다. 
+Mathf.Floor(float num) : 주어진 값(실수)에 대해서 버림한 값을 반환합니다. 
+
+Mathf.Approximately(float a, float b) :
+Mathf.Lerp(float a, float b, float t) :
+
+Mathf.Deg2Rad
+Mathf.Rad2Deg
+각각 라디안->각도, 각도->라디안으로 바꿀 때 필요한 상수의 읽기전용 변수입니다. 
+
+Mathf.PingPong(float value, float Max) : 최댓값에 도달하게 되면 다시 값이 0으로 되고 다시 최댓값까지 + 하면서 반복
+Mathf.Lerp(float from, float to, float t) : 어떤 수치에서 어떤 수치로 값이 변경 되는데 뚝! 바뀌지 않고 부드럽게 변경되고 싶을 때 사용합니다.
+
+Mathf.Sin() : 삼각형에서의 Sin 값은 높이 / 빗변이다.
+그런데 빗변은 1이기에 높이 / 1 즉 높이 값을 반환하는 것이다.
+Mathf.Cos() : 마찬가지로 Cos 값은 밑변 / 빗변  = 밑변이다.
+
+----------------------[ RigidBody ]-----------------------------
+
+AddForce() : 물리적인 힘을 가속도를 붙여서 가함
+AddTorque() : 물리적인 힘을 가해 정해진 방향으로 회전하는 함수
+Veclocity() : 물리적인 힘을 일정한 속도로 가함 
+ForceMode.Impulse : 즉발적으로 힘을 가함
+angularVelocity : 물리 회전 속도

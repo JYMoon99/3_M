@@ -1,0 +1,24 @@
+Animator
+
+Culling Mode (렌더링범위에서 벗어났을때)
+- 항상 애니메이션화(Always Animate) - 항상 애니메이션화하고 오프스크린일 경우에도 컬링을 하지 않습니다.
+- 업데이트 트랜스폼 컬링(Cull Update Transforms) - 렌더러가 보이지 않을 때 리타겟, IK 및 트랜스폼의 쓰기를 비활성화합니다.
+- 완전히 컬링(Cull Completely) : 렌더러가 보이지 않을 때 애니메이션을 완전히 비활성화합니다.
+
+Has Exit Time (종료 시간 있음)
+Fixed Duration (고정 지속 시간)
+Transition Duration(%) (전환지속시간(%))
+Interruption Source(중단 소스) : Current State Then Next State
+
+스테이트 패턴
+- 객체가 특정 상태에 따라 행동을 다르게 하는 상황에서 자신이 직접
+상태를 체크하여 상태에 따라 행동을 호출하지 않고, 상태를 객체화하여
+상태가 행동을 할 수 있도록 위임하는 패턴
+
+유니티
+TLS 오류 -> Assets에서 Reimport All을 하면 버그가 사라짐
+
+관성에 의한 쓰러짐
+Rigidbody - Constraints의 Freeze Rotation에 x축과 z축을 체크하면 해결
+
+Collision Detection = Continuous 를 하면 CPU는 쬐끔 더 쓰지만 더 좋은 물리계산을 함
