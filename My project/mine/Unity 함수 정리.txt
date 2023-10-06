@@ -96,3 +96,7 @@ AddTorque() : 물리적인 힘을 가해 정해진 방향으로 회전하는 함
 Veclocity() : 물리적인 힘을 일정한 속도로 가함 
 ForceMode.Impulse : 즉발적으로 힘을 가함
 angularVelocity : 물리 회전 속도
+
+---------------------[ NavMeshAgent ]---------------------------
+
+SetDestination() : 도착할 목표 위치 지정 함수
