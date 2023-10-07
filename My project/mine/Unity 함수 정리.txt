@@ -95,6 +95,7 @@ AddForce() : 물리적인 힘을 가속도를 붙여서 가함
 AddTorque() : 물리적인 힘을 가해 정해진 방향으로 회전하는 함수
 Veclocity() : 물리적인 힘을 일정한 속도로 가함 
 ForceMode.Impulse : 즉발적으로 힘을 가함
+ForceMode.Acceleration : 가속하여 속도를 가함
 angularVelocity : 물리 회전 속도
 
 ---------------------[ NavMeshAgent ]---------------------------
