@@ -69,10 +69,11 @@
     <Compile Include="Assets\QuarterView 3D Action BE5\ReadMe\Scripts\ReadmeBE5.cs" />
     <Compile Include="Assets\Script\Player\Orbit.cs" />
     <Compile Include="Assets\Script\Enemy\Missile.cs" />
+    <Compile Include="Assets\Script\Common\Shop.cs" />
     <Compile Include="Assets\Script\Enemy\BossMissile.cs" />
     <Compile Include="Assets\Script\Player\Follow.cs" />
     <Compile Include="Assets\Script\Enemy\BossRock.cs" />
-    <Compile Include="Assets\Script\Common\Shop.cs" />
+    <Compile Include="Assets\Script\Player\GameManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
