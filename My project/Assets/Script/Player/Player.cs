@@ -34,6 +34,7 @@ public class Player : MonoBehaviour
     bool fDown;
     bool gDown;
     bool rDown;
+    bool xDown;
 
     bool sDown1;
     bool sDown2;
@@ -45,6 +46,7 @@ public class Player : MonoBehaviour
     bool isReload;
     bool isFireReady = true;
     bool isBorder;
+    bool isShopping;
 
 
     Vector3 moveVec;
@@ -78,8 +80,8 @@ public class Player : MonoBehaviour
         Move();
         Turn();
         Jump();
-        Grenade();
         Dodge();
+        Grenade();
         Attack();
         Reload();
         Swap();
@@ -96,6 +98,7 @@ public class Player : MonoBehaviour
         gDown = Input.GetButtonDown("Fire2");
         rDown = Input.GetButtonDown("Reload");
         iDown = Input.GetButtonDown("Interation");
+        xDown = Input.GetButtonDown("NullWeapon");
         sDown1 = Input.GetButtonDown("Swap1");
         sDown2 = Input.GetButtonDown("Swap2");
         sDown3 = Input.GetButtonDown("Swap3");
@@ -105,6 +108,7 @@ public class Player : MonoBehaviour
     void Move()
     {
         // 움직임 구현
+        
         moveVec = new Vector3(hAxis, 0, vAxis).normalized;
 
         if(isDodge) 
@@ -114,7 +118,7 @@ public class Player : MonoBehaviour
         }
 
         // 무기 스왑중일때는 움직이지 않게 구현
-        if(isSwap || !isFireReady) { moveVec = Vector3.zero; }
+        if(isSwap || !isFireReady || isReload ) { moveVec = Vector3.zero; }
 
         // 걷기 속도는 0.3f / 평상시 속도 1f
         if(!isBorder)
@@ -153,7 +157,7 @@ public class Player : MonoBehaviour
     void Jump()
     {
         // 플레이어가 움직이지 않을때 점프 가능
-        if(jDown && moveVec == Vector3.zero && !isJump && !isDodge && isReload) 
+        if(jDown && moveVec == Vector3.zero && !isJump && !isDodge && !isReload) 
         {
             rigid.AddForce(Vector3.up * 15, ForceMode.Impulse); // ForceMode.Impulse : 즉발적으로 힘을 가함
             anim.SetBool("isJump", true);
@@ -194,20 +198,27 @@ public class Player : MonoBehaviour
         
     }
 
-
     void Dodge()
-    {   // 점프와 똑같은 jDown(space)사용 조건은 플레이어가 움직이고 있을 때 true
-        if (jDown && moveVec != Vector3.zero && !isJump && !isDodge)
+    {   // 점프와 똑같은 jDown(space)사용 조건은 플레이어가 움직이고 있을 때와 장착된 무기가 있을 경우
+        if (jDown && !isJump && !isDodge && equipWeapon != null)
         {
+            if (isReload)
+            {
+                isReload = false;
+                anim.SetTrigger("doDodge");
+                speed *= 2;
+                Invoke("DodgeOut", 0.4f); // 시간차 함수 호출
+                return;
+            }
 
-            // 닷지 할때의 벡터값을 닷지벡터에 저장
-            dodgeVec = moveVec;
-            speed *= 2;
-            anim.SetTrigger("doDodge");
-            isDodge = true;
-            
-            // 닷지 0.4f초 후 스피드값 정상화
-            Invoke("DodgeOut", 0.4f); // 시간차 함수 호출
+                // 닷지 할때의 벡터값을 닷지벡터에 저장
+                dodgeVec = moveVec;
+                speed *= 2;
+                anim.SetTrigger("doDodge");
+                isDodge = true;
+
+                // 닷지 0.4f초 후 스피드값 정상화
+                Invoke("DodgeOut", 0.4f); // 시간차 함수 호출
         }
     }
 
@@ -223,13 +234,14 @@ public class Player : MonoBehaviour
         if (equipWeapon == null)
             return;
 
-        // 대기 시간 저장
-        if (!isReload)
+        if (isReload)
+            return;
+
         fireDelay += Time.deltaTime; // Time.deltaTime : 1프레임 당 걸리는 시간
         // 대기 시간보다 장착 무기의 공격속도가 낮으면 공격준비 true
         isFireReady = equipWeapon.rate < fireDelay;
 
-        if (fDown && isFireReady && !isDodge && !isSwap)
+        if (fDown && isFireReady && !isDodge && !isSwap && !isShopping)
         {
             equipWeapon.Use();
             // 근접 무기일때는 스윙 : 나머지는 샷
@@ -247,29 +259,36 @@ public class Player : MonoBehaviour
 
         if (equipWeapon.type == Weapon.Type.Melee) return;
 
-        if (ammo == 0) return;
+        if (ammo == 0 || equipWeapon.curAmmo == equipWeapon.maxAmmo) return;
 
-        if (rDown && !isJump && !isDodge && !isSwap && !isReload && isFireReady) 
+
+
+        if (rDown && !isJump && !isDodge && !isSwap && !isReload && isFireReady && !isShopping) 
         {
             // 장전하면서 총을 쏘는 버그 방지
-            fireDelay = 0;
 
             anim.SetTrigger("doReload");
             isReload = true;
 
-            Invoke("ReloadOut", 2f);
+            StartCoroutine(ReloadOut());
         }
     }
 
-    void ReloadOut()
+    IEnumerator ReloadOut()
     {
         // 장전할 때 총알의 개수 로직
+        yield return new WaitForSeconds(2f);
+
+        if(isDodge)
+        {
+            Debug.Log("isDodge");
+        }
+
         int reAmmo = ammo < equipWeapon.maxAmmo ? ammo : equipWeapon.maxAmmo - equipWeapon.curAmmo;
 
-        equipWeapon.curAmmo += reAmmo;
-        ammo -= reAmmo;
-        isReload = false;
-
+            equipWeapon.curAmmo += reAmmo;
+            ammo -= reAmmo;
+            isReload = false;
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -296,6 +315,7 @@ public class Player : MonoBehaviour
         if (sDown2) weaponIndex = 1;
         if (sDown3) weaponIndex = 2;
 
+
         if (sDown1 || sDown2 || sDown3)
         {
             // 장착중인 무기가 있을때만 해당 무기를 비활성화
@@ -304,15 +324,15 @@ public class Player : MonoBehaviour
                 equipWeapon.gameObject.SetActive(false);
             }
 
-            equipWeaponIndex = weaponIndex;
-            equipWeapon = weapons[weaponIndex].GetComponent<Weapon>();
-            equipWeapon.gameObject.SetActive(true);
+                equipWeaponIndex = weaponIndex;
+                equipWeapon = weapons[weaponIndex].GetComponent<Weapon>();
+                equipWeapon.gameObject.SetActive(true);
 
-            anim.SetTrigger("doSwap");
+                anim.SetTrigger("doSwap");
 
-            isSwap = true;
+                isSwap = true;
 
-            Invoke("SwapOut", 0.4f);
+                Invoke("SwapOut", 0.4f);
 
             // 스왑도중에는 이동불가
             moveVec = Vector3.zero;
@@ -336,6 +356,12 @@ public class Player : MonoBehaviour
                 hasWeapons[weaponIndex] = true;
                 // 드롭한 무기 제거
                 Destroy(nearObject);
+            }
+            else if(nearObject.tag == "Shop")
+            {
+                Shop shop = nearObject.GetComponent<Shop>();
+                shop.Enter(this);
+                isShopping = true;
             }
         }
     }
@@ -384,10 +410,15 @@ public class Player : MonoBehaviour
                         health = MaxHealth;
                     break;
                 case Item.Type.Grenade:
+                    if (hasGrenades >= MaxHasGrenades)
+                        return;
+
                     grenades[hasGrenades].SetActive(true);
                     hasGrenades += item.value;
+
                     if (hasGrenades >= MaxHasGrenades)
                         hasGrenades = MaxHasGrenades;
+
                     break;
             }
             Destroy(other.gameObject);
@@ -434,7 +465,7 @@ public class Player : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if(other.tag == "Weapon")
+        if(other.tag == "Weapon" || other.tag == "Shop")
         {
             nearObject = other.gameObject;
         }
@@ -444,6 +475,13 @@ public class Player : MonoBehaviour
     {
         if (other.tag == "Weapon")
         {
+            nearObject = null;
+        }
+        else if (other.tag == "Shop")
+        {
+            Shop shop = nearObject.GetComponent<Shop>();
+            shop.Exit();
+            isShopping = false;
             nearObject = null;
         }
     }

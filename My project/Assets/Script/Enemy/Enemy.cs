@@ -207,7 +207,9 @@ public class Enemy : MonoBehaviour
                 mesh.material.color = Color.red;
             }
 
-            yield return new WaitForSeconds(0.1f);
+            if (curHp > 0)
+                yield return new WaitForSeconds(0.1f);
+
             if (curHp > 0)
             {
                 foreach (MeshRenderer mesh in meshs)
@@ -228,6 +230,7 @@ public class Enemy : MonoBehaviour
             isDead = true;
             isChase = false;
             navAgent.enabled = false; // 사망시 넉백효과를 유지하기위해 NavAgent 비활성화
+            enemyRigid.isKinematic = true;
             enemyAni.SetTrigger("doDie");
 
 
@@ -235,17 +238,17 @@ public class Enemy : MonoBehaviour
             {
                 // 수류탄 피해 효과
                 reactVec = reactVec.normalized;
-                reactVec += Vector3.up * 3;
+                reactVec += Vector3.up * 10;
 
                 enemyRigid.freezeRotation = false;
                 enemyRigid.AddForce(reactVec * 5, ForceMode.Impulse);
-                enemyRigid.AddTorque(reactVec * 15, ForceMode.Impulse);
+                enemyRigid.AddTorque(reactVec * 10, ForceMode.Impulse);
             }
             else
             {
                 // 기본 피해 효과
                 reactVec = reactVec.normalized;
-                reactVec += Vector3.up;
+                reactVec += Vector3.up * 5;
 
                 enemyRigid.AddForce(reactVec * 5, ForceMode.Impulse);
             }

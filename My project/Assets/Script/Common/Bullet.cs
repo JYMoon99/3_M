@@ -26,6 +26,11 @@ public class Bullet : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        if (!isRock && !isMelee && other.gameObject.tag == "Floor")
+        {
+            Destroy(gameObject);
+        }
     }
 
     void Update()

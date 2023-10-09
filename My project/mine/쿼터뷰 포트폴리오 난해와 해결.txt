@@ -9,7 +9,9 @@
 - Enemy C의 피격상태 표시가 제대로 나타나지 않는 버그가 생겨서
 MeshRender[ ]를 사용하고 foreach문으로 전체 mesh에 색을 입혀 해결
 
-- 보스 몬스터가 점프공격을 하고있을때 사망하게 되면 그냥 Destroy되어버림
+- 보스 몬스터가 가끔씩 사망하게 되면 그냥 Destroy되어버림
+- Destroy되는줄 알았는데 그게 아니라 Floor를 통과해서 밑으로 끝없이 내려가는중
+- 몬스터가 사망시 isKinematic = true; 를 하여 물리적인 영향을 받지않게 수정
 
 - 총알이 curAmmo와 관계없이 Ammo에서 equipWeapon.maxAmmo의 총알을 가져온다.
 reAmmo의 조건을 equipWeapon.maxAmmo 에서 curAmmo를 뺀 후 그 값을 curAmmo에 +해서 해결
@@ -18,6 +20,19 @@ reAmmo의 조건을 equipWeapon.maxAmmo 에서 curAmmo를 뺀 후 그 값을 cur
 장전할때 fireDelay를 0으로 만들고 fireDelay += Time.deltaTime에 if문으로 !isReload를 조건으로 붙여서
 버그 해결 및 장전중일때 Attack이 실행되는 오류 수정
 
+상점 UI에서 아이템을 구입후에 Space를 누르면 자동으로 아이템을 구매하는 버그가 발생
+- 버튼 컴포턴트에 있는 Navigation을 None으로 변경하니 해결
+
 ---------------------개선점-----------------------------
 
 - 수류탄 오브젝트 비활성화상태에서 활성화시키기
+
+X를 눌렀을때 무기 장착 해제
+
+무기를 들고있을때는 - 구르기
+
+무기를 집어넣었을때는 - 점프
+
+기본적으로 해머는 장착되어있음.
+	
+X키를 눌렀을때 equipWeapon 해제
