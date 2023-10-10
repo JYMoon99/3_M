@@ -9,6 +9,9 @@ public class GameManager : MonoBehaviour
     public GameObject gameCam;
     public Player player;
     public Boss boss;
+    public GameObject itemShop;
+    public GameObject weaponShop;
+    public GameObject startZone;
     public int stage;
     public float playTime;
     public bool isBattle;
@@ -52,6 +55,35 @@ public class GameManager : MonoBehaviour
         player.gameObject.SetActive(true);
     }
 
+    public void StageStart()
+    {
+        itemShop.SetActive(false);
+        weaponShop.SetActive(false);
+        startZone.SetActive(false);
+
+        isBattle = true;
+        StartCoroutine(InBattle());
+    }
+
+    public void StageEnd()
+    {
+        player.transform.position = Vector3.up * 0.65f;
+
+        itemShop.SetActive(true);
+        weaponShop.SetActive(true);
+        startZone.SetActive(true);
+
+        isBattle = false;
+
+        stage++;
+    }
+
+    IEnumerator InBattle()
+    {
+        yield return new WaitForSeconds(5f);
+        StageEnd();
+    }
+
     private void Update()
     {
         if (isBattle)
@@ -64,7 +96,7 @@ public class GameManager : MonoBehaviour
     {
         // »ó´Ü UI
         scoreTxt.text = string.Format("{0:n0}", player.score);
-        stageTxt.text = "STAGE" + stage;
+        stageTxt.text = "STAGE " + stage;
 
         int hour = (int)(playTime / 3600);
         int min = (int)((playTime - hour * 3600) / 60);

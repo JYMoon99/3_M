@@ -363,6 +363,7 @@
 "Assets/Script/Player/Light.cs"
 "Assets/Script/Player/Orbit.cs"
 "Assets/Script/Player/Player.cs"
+"Assets/Script/Player/StartZone.cs"
 "Assets/Script/Player/Weapon.cs"
 -langversion:9.0
 

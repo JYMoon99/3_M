@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Script\Player\Light.cs" />
+    <Compile Include="Assets\Script\Player\GameManager.cs" />
     <Compile Include="Assets\Script\Enemy\Boss.cs" />
     <Compile Include="Assets\Script\Enemy\Enemy.cs" />
     <Compile Include="Assets\Script\Player\Weapon.cs" />
@@ -73,7 +74,7 @@
     <Compile Include="Assets\Script\Enemy\BossMissile.cs" />
     <Compile Include="Assets\Script\Player\Follow.cs" />
     <Compile Include="Assets\Script\Enemy\BossRock.cs" />
-    <Compile Include="Assets\Script\Player\GameManager.cs" />
+    <Compile Include="Assets\Script\Player\StartZone.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
