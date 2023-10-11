@@ -11,9 +11,12 @@ public class Enemy : MonoBehaviour
 
     public int maxHp;
     public int curHp;
+    public int score;
+    public GameManager manager;
     public Transform target;
     public BoxCollider meleeArea;
     public GameObject bullet;
+    public GameObject[] coins;
     public bool isChase;
     public bool isAttack;
     public bool isDead;
@@ -160,7 +163,7 @@ public class Enemy : MonoBehaviour
     }
 
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerExit(Collider other)
     {
         // 근접 공격과 원거리 공격 구별
         if (other.tag == "Melee")
@@ -232,6 +235,29 @@ public class Enemy : MonoBehaviour
             navAgent.enabled = false; // 사망시 넉백효과를 유지하기위해 NavAgent 비활성화
             enemyRigid.isKinematic = true;
             enemyAni.SetTrigger("doDie");
+            Player player = target.GetComponent<Player>();
+            player.score += score;
+            int ranCoin = Random.Range(0, 3);
+
+            // Quaternion.identity 알아보기
+            Instantiate(coins[ranCoin], transform.position, Quaternion.identity);
+
+            switch(enemyType)
+            {
+                case Type.A:
+                    manager.enemyCntA--;
+                    break;
+                case Type.B:
+                    manager.enemyCntB--;
+                    break;
+                case Type.C:
+                    manager.enemyCntC--;
+                    break;
+                case Type.D:
+                    manager.enemyCntD--;
+                    break;
+            }
+
 
 
             if (isGrenade)
@@ -254,7 +280,6 @@ public class Enemy : MonoBehaviour
             }
 
             // 죽은 몬스터 삭제
-            if(enemyType != Type.D)
                 Destroy(gameObject, 3f);
         }
     }

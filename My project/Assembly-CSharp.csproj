@@ -67,6 +67,7 @@
     <Compile Include="Assets\Script\Enemy\EnemyAttackRange.cs" />
     <Compile Include="Assets\Script\Player\Grenade.cs" />
     <Compile Include="Assets\Script\Player\Player.cs" />
+    <Compile Include="Assets\Script\Player\StartZone.cs" />
     <Compile Include="Assets\QuarterView 3D Action BE5\ReadMe\Scripts\ReadmeBE5.cs" />
     <Compile Include="Assets\Script\Player\Orbit.cs" />
     <Compile Include="Assets\Script\Enemy\Missile.cs" />
@@ -74,7 +75,6 @@
     <Compile Include="Assets\Script\Enemy\BossMissile.cs" />
     <Compile Include="Assets\Script\Player\Follow.cs" />
     <Compile Include="Assets\Script\Enemy\BossRock.cs" />
-    <Compile Include="Assets\Script\Player\StartZone.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

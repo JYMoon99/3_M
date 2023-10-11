@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
 
 public class GameManager : MonoBehaviour
 {
@@ -18,9 +20,15 @@ public class GameManager : MonoBehaviour
     public int enemyCntA;
     public int enemyCntB;
     public int enemyCntC;
+    public int enemyCntD;
+
+    public Transform[] enemyZones;
+    public GameObject[] enemies;
+    public List<int> enemyList;
 
     public GameObject menuPanel;
     public GameObject gamePanel;
+    public GameObject overPanel;
     public Text maxScoreTxt;
     public Text scoreTxt;
     public Text stageTxt;
@@ -37,11 +45,27 @@ public class GameManager : MonoBehaviour
     public Text enemyCTxt;
     public RectTransform bossHealthGroup;
     public RectTransform bossHealthBar;
+    public Text curScoreTxt;
+    public Text bestTxt;
+
 
 
     private void Awake()
     {
-        maxScoreTxt.text = string.Format("{0:n0}",  PlayerPrefs.GetInt("MaxScore"));
+        // 각 스테이지에 등장할 몬스터 수 저장
+        enemyList = new List<int>();
+
+         if(!PlayerPrefs.HasKey("MaxScore"))
+         {
+            PlayerPrefs.SetInt("MaxScore", 0);
+         }
+
+        int maxScore = PlayerPrefs.GetInt("MaxScore");
+        Debug.Log("Menu MaxScore : " + maxScore);
+
+        maxScoreTxt.text = string.Format("{0:n0}", PlayerPrefs.GetInt("MaxScore"));
+
+
     }
 
     public void GameStart()
@@ -55,11 +79,46 @@ public class GameManager : MonoBehaviour
         player.gameObject.SetActive(true);
     }
 
+    public void GameOver()
+    {
+        gamePanel.SetActive(false);
+        overPanel.SetActive(true);
+        curScoreTxt.text = scoreTxt.text;
+
+        int maxScore = PlayerPrefs.GetInt("MaxScore");
+        Debug.Log("MaxScore : " + maxScore);
+        Debug.Log("PlayerScore : " + player.score);
+        
+        if(player.score > maxScore)
+        {
+            bestTxt.gameObject.SetActive(true);
+            PlayerPrefs.SetInt("MaxScore", player.score);
+        }
+        else
+            bestTxt.gameObject.SetActive(false);
+        
+
+
+        PlayerPrefs.Save();
+        Debug.Log("MaxScore : " + maxScore);
+    }
+
+    public void ReStart()
+    {
+        SceneManager.LoadScene(0);
+    }
+
     public void StageStart()
     {
         itemShop.SetActive(false);
         weaponShop.SetActive(false);
         startZone.SetActive(false);
+
+        foreach(Transform zone in enemyZones)
+        {
+            zone.gameObject.SetActive(true);
+        }
+        
 
         isBattle = true;
         StartCoroutine(InBattle());
@@ -73,6 +132,11 @@ public class GameManager : MonoBehaviour
         weaponShop.SetActive(true);
         startZone.SetActive(true);
 
+        foreach (Transform zone in enemyZones)
+        {
+            zone.gameObject.SetActive(true);
+        }
+
         isBattle = false;
 
         stage++;
@@ -80,8 +144,61 @@ public class GameManager : MonoBehaviour
 
     IEnumerator InBattle()
     {
-        yield return new WaitForSeconds(5f);
+        if(stage % 5 == 0)
+        {
+            enemyCntD++;
+            GameObject instantEnemy = Instantiate(enemies[3], enemyZones[0].position, enemyZones[0].rotation);
+            Enemy enemy = instantEnemy.GetComponent<Enemy>();
+            enemy.target = player.transform;
+            boss = instantEnemy.GetComponent<Boss>();
+            enemy.manager = this;
+
+        }
+        else
+        {
+            for (int index = 0; index < stage; index++)
+            {
+                int ran = Random.Range(0, 3);
+
+                // List 저장
+                enemyList.Add(ran);
+
+                switch (ran)
+                {
+                    case 0:
+                        enemyCntA++;
+                        break;
+                    case 1:
+                        enemyCntB++;
+                        break;
+                    case 2:
+                        enemyCntC++;
+                        break;
+                }
+            }
+
+            while (enemyList.Count > 0)
+            {
+                int ranZone = Random.Range(0, 4);
+                GameObject instantEnemy = Instantiate(enemies[enemyList[0]], enemyZones[ranZone].position, enemyZones[ranZone].rotation);
+                Enemy enemy = instantEnemy.GetComponent<Enemy>();
+                enemy.target = player.transform;
+                enemy.manager = this;
+                enemyList.RemoveAt(0);
+                yield return new WaitForSeconds(4f);
+            }
+        }
+
+        // 반복문으로 Update()와 같은 역할
+        while(enemyCntA + enemyCntB + enemyCntC + enemyCntD > 0)
+        {
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(4f);
+        boss = null;
         StageEnd();
+
     }
 
     private void Update()
@@ -127,7 +244,15 @@ public class GameManager : MonoBehaviour
         enemyCTxt.text = enemyCntC.ToString();
 
         // 보스 UI
-        bossHealthBar.localScale = new Vector3((float)boss.curHp / boss.maxHp, 1, 1); // 보스의 체력이 둘 다 int형이라 하나만 float로 변경
+        if(boss != null)
+        {
+            bossHealthGroup.anchoredPosition = Vector2.down * 30;
+            bossHealthBar.localScale = new Vector3((float)boss.curHp / boss.maxHp, 1, 1); // 보스의 체력이 둘 다 int형이라 하나만 float로 변경
+        }
+        else
+        {
+            bossHealthGroup.anchoredPosition = Vector2.up * 200;   
+        }
         
 
     }

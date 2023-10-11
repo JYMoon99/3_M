@@ -13,6 +13,7 @@ public class Player : MonoBehaviour
     public GameObject[] grenades;
     public GameObject grenadeObject;
     public Camera followCamera;
+    public GameManager manager;
     
     public int ammo;
     public int coin;
@@ -48,6 +49,7 @@ public class Player : MonoBehaviour
     bool isFireReady = true;
     bool isBorder;
     bool isShopping;
+    bool isDead;
 
 
     Vector3 moveVec;
@@ -69,7 +71,7 @@ public class Player : MonoBehaviour
         anim = GetComponentInChildren<Animator>();
         playerMeshs = GetComponentsInChildren<MeshRenderer>();
 
-        PlayerPrefs.SetInt("MaxScore", 0); // PlayerPrefs : 유니티에서 제공하는 간단한 저장 기능
+       // PlayerPrefs.SetInt("MaxScore", 0); // PlayerPrefs : 유니티에서 제공하는 간단한 저장 기능
     }
 
     private void Start()
@@ -120,8 +122,8 @@ public class Player : MonoBehaviour
             moveVec = dodgeVec;
         }
 
-        // 무기 스왑중일때는 움직이지 않게 구현
-        if(isSwap || !isFireReady || isReload ) { moveVec = Vector3.zero; }
+        // 특정 상황에서 움직이지 않게 구현
+        if(isSwap || !isFireReady || isReload || isDead) { moveVec = Vector3.zero; }
 
         // 걷기 속도는 0.3f / 평상시 속도 1f
         if(!isBorder)
@@ -141,7 +143,7 @@ public class Player : MonoBehaviour
         Ray ray = followCamera.ScreenPointToRay(Input.mousePosition); // ScreenPointToRay() : 스크린에서 월드로 Ray를 쏘는 함수
         RaycastHit rayHit;
 
-        if (fDown)
+        if (fDown && !isDead)
         {
             // Physics.Raycast는 직선을 씬에 투영하여 대상에 적중되면 true를 리턴하는 물리 함수다.
             if (Physics.Raycast(ray, out rayHit, 100)) // out : return처럼 반환값을 주어진 변수에 저장하는 키워드
@@ -160,7 +162,7 @@ public class Player : MonoBehaviour
     void Jump()
     {
         // 플레이어가 움직이지 않을때 점프 가능
-        if(jDown && moveVec == Vector3.zero && !isJump && !isDodge && !isReload) 
+        if(jDown && moveVec == Vector3.zero && !isJump && !isDodge && !isReload && !isDead) 
         {
             rigid.AddForce(Vector3.up * 15, ForceMode.Impulse); // ForceMode.Impulse : 즉발적으로 힘을 가함
             anim.SetBool("isJump", true);
@@ -176,7 +178,7 @@ public class Player : MonoBehaviour
         if (hasGrenades == 0)
             return;
 
-        if(gDown) 
+        if(gDown && !isDead) 
         {
             Ray ray = followCamera.ScreenPointToRay(Input.mousePosition); // ScreenPointToRay() : 스크린에서 월드로 Ray를 쏘는 함수
             RaycastHit rayHit;
@@ -203,7 +205,7 @@ public class Player : MonoBehaviour
 
     void Dodge()
     {   // 점프와 똑같은 jDown(space)사용 조건은 플레이어가 움직이고 있을 때와 장착된 무기가 있을 경우
-        if (jDown && !isJump && !isDodge && equipWeapon != null)
+        if (jDown && !isJump && !isDodge && equipWeapon != null && !isDead)
         {
             if (isReload)
             {
@@ -244,7 +246,7 @@ public class Player : MonoBehaviour
         // 대기 시간보다 장착 무기의 공격속도가 낮으면 공격준비 true
         isFireReady = equipWeapon.rate < fireDelay;
 
-        if (fDown && isFireReady && !isDodge && !isSwap && !isShopping)
+        if (fDown && isFireReady && !isDodge && !isSwap && !isShopping && !isDead)
         {
             equipWeapon.Use();
             // 근접 무기일때는 스윙 : 나머지는 샷
@@ -266,7 +268,7 @@ public class Player : MonoBehaviour
 
 
 
-        if (rDown && !isJump && !isDodge && !isSwap && !isReload && isFireReady && !isShopping) 
+        if (rDown && !isJump && !isDodge && !isSwap && !isReload && isFireReady && !isShopping && !isDead) 
         {
             // 장전하면서 총을 쏘는 버그 방지
 
@@ -452,8 +454,13 @@ public class Player : MonoBehaviour
         {
             mesh.material.color = Color.red;
         }
+
         if(isBossAtk)
             rigid.AddForce(transform.forward * -25, ForceMode.Impulse);
+
+
+        if (health <= 0 && !isDead)
+            OnDie();
 
         yield return new WaitForSeconds(1f);
 
@@ -464,6 +471,15 @@ public class Player : MonoBehaviour
 
         if(isBossAtk)
             rigid.velocity = Vector3.zero;
+    }
+
+    private void OnDie()
+    {
+        anim.SetTrigger("doDie");
+        isDead = true;
+
+        manager.GameOver();
+
     }
 
     private void OnTriggerStay(Collider other)
