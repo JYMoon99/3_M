@@ -77,6 +77,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ea458e78f4ba8c4bae2f82a9ccfc8ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  objectSound:
+    sfxAudioClip:
+    - {fileID: 8300000, guid: d4aee29185389894b9cc0d8873904a49, type: 3}
+    bgmAudioClip: []
   meshObject: {fileID: 4358422566731254670}
   effectObject: {fileID: 8097348553596659146}
   grenadeRigid: {fileID: 7380950259746544663}

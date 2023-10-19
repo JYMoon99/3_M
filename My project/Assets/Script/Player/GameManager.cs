@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     public int stage;
     public float playTime;
     public bool isBattle;
+    public bool isInvincible;
     public int enemyCntA;
     public int enemyCntB;
     public int enemyCntC;
@@ -25,6 +26,7 @@ public class GameManager : MonoBehaviour
     public Transform[] enemyZones;
     public GameObject[] enemies;
     public List<int> enemyList;
+    public ObjectSound objectSound = new ObjectSound();
 
     public GameObject menuPanel;
     public GameObject gamePanel;
@@ -65,11 +67,18 @@ public class GameManager : MonoBehaviour
 
         maxScoreTxt.text = string.Format("{0:n0}", PlayerPrefs.GetInt("MaxScore"));
 
+        SoundManager.Instance.BgmSound(objectSound.bgmAudioClip[0]);
+        
+
 
     }
 
     public void GameStart()
     {
+        SoundManager.Instance.BgmStop();
+
+        SoundManager.Instance.BgmSound(objectSound.bgmAudioClip[1]);
+
         menuCam.SetActive(false);
         gameCam.SetActive(true);
 
@@ -83,6 +92,10 @@ public class GameManager : MonoBehaviour
     {
         gamePanel.SetActive(false);
         overPanel.SetActive(true);
+        SoundManager.Instance.BgmStop();
+        SoundManager.Instance.SfxSound(objectSound.sfxAudioClip[1]);
+
+
         curScoreTxt.text = scoreTxt.text;
 
         int maxScore = PlayerPrefs.GetInt("MaxScore");
@@ -105,6 +118,8 @@ public class GameManager : MonoBehaviour
 
     public void ReStart()
     {
+        SoundManager.Instance.BgmStop();
+
         SceneManager.LoadScene(0);
     }
 
@@ -114,18 +129,22 @@ public class GameManager : MonoBehaviour
         weaponShop.SetActive(false);
         startZone.SetActive(false);
 
-        foreach(Transform zone in enemyZones)
+
+        foreach (Transform zone in enemyZones)
         {
             zone.gameObject.SetActive(true);
         }
-        
 
+        isInvincible = false;
         isBattle = true;
         StartCoroutine(InBattle());
     }
 
     public void StageEnd()
     {
+        SoundManager.Instance.BgmStop();
+        SoundManager.Instance.BgmSound(objectSound.bgmAudioClip[1]);
+
         player.transform.position = Vector3.up * 0.65f;
 
         itemShop.SetActive(true);
@@ -134,7 +153,7 @@ public class GameManager : MonoBehaviour
 
         foreach (Transform zone in enemyZones)
         {
-            zone.gameObject.SetActive(true);
+            zone.gameObject.SetActive(false);
         }
 
         isBattle = false;
@@ -146,6 +165,9 @@ public class GameManager : MonoBehaviour
     {
         if(stage % 5 == 0)
         {
+            SoundManager.Instance.BgmStop();
+            SoundManager.Instance.BgmSound(objectSound.bgmAudioClip[3]);
+
             enemyCntD++;
             GameObject instantEnemy = Instantiate(enemies[3], enemyZones[0].position, enemyZones[0].rotation);
             Enemy enemy = instantEnemy.GetComponent<Enemy>();
@@ -156,6 +178,8 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            SoundManager.Instance.BgmStop();
+            SoundManager.Instance.BgmSound(objectSound.bgmAudioClip[2]);
             for (int index = 0; index < stage; index++)
             {
                 int ran = Random.Range(0, 3);
@@ -194,7 +218,9 @@ public class GameManager : MonoBehaviour
         {
             yield return null;
         }
-
+        isInvincible = true;
+        SoundManager.Instance.BgmStop();
+        SoundManager.Instance.SfxSound(objectSound.sfxAudioClip[0]);
         yield return new WaitForSeconds(4f);
         boss = null;
         StageEnd();

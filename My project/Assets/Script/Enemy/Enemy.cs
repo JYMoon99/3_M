@@ -225,6 +225,10 @@ public class Enemy : MonoBehaviour
         {
             // 몬스터 Die로 레이어 변경
             gameObject.layer = 12;
+            curHp = 0;
+
+        //    if(enemyType != Type.C || enemyType != Type.D)
+        //    meleeArea.enabled = false;
 
             foreach (MeshRenderer mesh in meshs)
             {

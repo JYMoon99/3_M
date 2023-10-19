@@ -8,13 +8,15 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField] float speed;
+    [SerializeField] ObjectSound objectSound = new ObjectSound();
+
     public GameObject[] weapons;
     public bool[] hasWeapons;
     public GameObject[] grenades;
     public GameObject grenadeObject;
     public Camera followCamera;
     public GameManager manager;
-    
+
     public int ammo;
     public int coin;
     public int health;
@@ -62,7 +64,7 @@ public class Player : MonoBehaviour
     public Weapon equipWeapon;
     MeshRenderer[] playerMeshs;
 
-    int equipWeaponIndex = -1;
+    public int equipWeaponIndex = -1;
     float fireDelay;
 
     private void Awake()
@@ -76,7 +78,7 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-
+        
     }
 
     private void Update()
@@ -180,6 +182,8 @@ public class Player : MonoBehaviour
 
         if(gDown && !isDead) 
         {
+            SoundManager.Instance.SfxSound(objectSound.sfxAudioClip[3]);
+
             Ray ray = followCamera.ScreenPointToRay(Input.mousePosition); // ScreenPointToRay() : 스크린에서 월드로 Ray를 쏘는 함수
             RaycastHit rayHit;
             if (Physics.Raycast(ray, out rayHit, 100)) // out : return처럼 반환값을 주어진 변수에 저장하는 키워드
@@ -207,6 +211,8 @@ public class Player : MonoBehaviour
     {   // 점프와 똑같은 jDown(space)사용 조건은 플레이어가 움직이고 있을 때와 장착된 무기가 있을 경우
         if (jDown && !isJump && !isDodge && equipWeapon != null && !isDead)
         {
+            SoundManager.Instance.SfxSound(objectSound.sfxAudioClip[2]);
+
             if (isReload)
             {
                 isReload = false;
@@ -248,11 +254,27 @@ public class Player : MonoBehaviour
 
         if (fDown && isFireReady && !isDodge && !isSwap && !isShopping && !isDead)
         {
+
+            if (equipWeaponIndex == 1)
+            {
+                SoundManager.Instance.SfxSound(objectSound.sfxAudioClip[0]);
+            }
+            else if (equipWeaponIndex == 2)
+            {
+                SoundManager.Instance.SfxSound(objectSound.sfxAudioClip[1]);
+            }
+            else if (equipWeaponIndex == 0)
+            {
+                SoundManager.Instance.SfxSound(objectSound.sfxAudioClip[4]);
+            }
+
             equipWeapon.Use();
             // 근접 무기일때는 스윙 : 나머지는 샷
             anim.SetTrigger(equipWeapon.type == Weapon.Type.Melee ? "doSwing" : "doShot");
             // 대기 시간 초기화
             fireDelay = 0;
+
+
 
         }
     }
@@ -431,9 +453,10 @@ public class Player : MonoBehaviour
         }
         else if (other.tag == "EnemyBullet")
         {
-
             // 일반 어택
             Bullet enemyBullet = other.GetComponent<Bullet>();
+
+            if(!manager.isInvincible)
             health -= enemyBullet.damage;
 
             // 보스 어택
@@ -449,6 +472,7 @@ public class Player : MonoBehaviour
 
     IEnumerator OnDamage(bool isBossAtk)
     {
+        SoundManager.Instance.SfxSound(objectSound.sfxAudioClip[5]);
 
         foreach(MeshRenderer mesh in playerMeshs)
         {

@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class Grenade : MonoBehaviour
 {
+    [SerializeField] ObjectSound objectSound = new ObjectSound();
+
     public GameObject meshObject;
     public GameObject effectObject;
     public Rigidbody grenadeRigid;
+    
 
     public int damage;
 
@@ -17,6 +20,8 @@ public class Grenade : MonoBehaviour
     IEnumerator Explosion()
     {
         yield return new WaitForSeconds(3f);
+
+        SoundManager.Instance.SfxSound(objectSound.sfxAudioClip[0]);
         // 터질 때 물리적인 움직임 없애기
         grenadeRigid.velocity = Vector3.zero;
         grenadeRigid.angularVelocity = Vector3.zero;

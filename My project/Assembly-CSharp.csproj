@@ -63,6 +63,8 @@
     <Compile Include="Assets\Script\Player\Weapon.cs" />
     <Compile Include="Assets\Script\Player\BulletCase.cs" />
     <Compile Include="Assets\Script\Common\Bullet.cs" />
+    <Compile Include="Assets\Script\Common\ObjectSound.cs" />
+    <Compile Include="Assets\Script\Common\SoundManager.cs" />
     <Compile Include="Assets\Script\Player\Item.cs" />
     <Compile Include="Assets\Script\Enemy\EnemyAttackRange.cs" />
     <Compile Include="Assets\Script\Player\Grenade.cs" />
@@ -70,6 +72,7 @@
     <Compile Include="Assets\Script\Player\StartZone.cs" />
     <Compile Include="Assets\QuarterView 3D Action BE5\ReadMe\Scripts\ReadmeBE5.cs" />
     <Compile Include="Assets\Script\Player\Orbit.cs" />
+    <Compile Include="Assets\Script\Common\Singleton.cs" />
     <Compile Include="Assets\Script\Enemy\Missile.cs" />
     <Compile Include="Assets\Script\Common\Shop.cs" />
     <Compile Include="Assets\Script\Enemy\BossMissile.cs" />

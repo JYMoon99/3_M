@@ -81,6 +81,7 @@ MonoBehaviour:
   maxHp: 200
   curHp: 200
   score: 200
+  manager: {fileID: 0}
   target: {fileID: 0}
   meleeArea: {fileID: 0}
   bullet: {fileID: 706932788516953523, guid: 959e84035e15db74d95b6a996bf100df, type: 3}
